@@ -1,0 +1,1 @@
+// Desglose de idea ((mas detalle))
