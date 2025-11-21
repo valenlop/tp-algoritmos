@@ -1,0 +1,17 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#define VENTANA_ANCHO 640
+#define VENTANA_ALTO 576
+
+#define JUEGO_FPS 30
+
+#define VELOCIDAD_INICIAL 500
+#define VELOCIDAD_JUEGO 25
+#define VELOCIDAD_FINAL 500
+
+#define VELOCIDAD_DISPARO 250
+
+#define PUNTOS_POR_BOLA 10
+
+#endif
