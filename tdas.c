@@ -2,15 +2,15 @@
 
 /*
 
-- pieza.h: Item "Las piezas"
+- pieza.h: Item "Las piezas" ((JUAN LO HACE))
 
     
 
-- juego.h: Items "El juego", "Mas sprites", "El puntaje" y "La evolucion del juego"
+- juego.h: Items "El juego", "Mas sprites", "El puntaje" y "La evolucion del juego" ((ESTO MAS ADELANTE))
 
 
 
-- tablero.h: Items "El tablero", "Simulacion de arena" y "Deteccion de lineas"
+- tablero.h: Items "El tablero", "Simulacion de arena" y "Deteccion de lineas" ((LO HAGO YO))
 
 
 
