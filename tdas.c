@@ -2,11 +2,17 @@
 
 /*
 
-- pieza.h: Una pieza actual (la pieza que cae).
+- pieza.h: Item "Las piezas"
 
-- juego.h: 
+    
 
-- tablero.h: 
+- juego.h: Items "El juego", "Mas sprites", "El puntaje" y "La evolucion del juego"
+
+
+
+- tablero.h: Items "El tablero", "Simulacion de arena" y "Deteccion de lineas"
+
+
 
 */
 
@@ -17,13 +23,13 @@
 
 /*
 
-- color.h:
+- color.h: Item "Espacio de colores DEF". ((Completo))
 
-- imagen.h:
+- imagen.h: ((Agregar primitivas + adaptar las del EJO1)) Las primitivas sugeridas puede que se superpongan con alguna del TDA "pieza.h"
 
-- sprite.h
+- sprite.h: ((Completo))
 
-- sprites.h:
+- sprites.h: ((Completo))
 
 */
 
@@ -32,14 +38,14 @@
 
 /*
 
-- matriz.h:
+- matriz.h: Tengo primitivas que debo adaptar al TDA "imagen.h"
 
-- config.h:
+- config.h: Define valores utiles en "test_sdl2.c" ((Podria modificarlos en una etapa final del tp))
 
-- test_sdl2.c: 
+- test_sdl2.c: Basicamente es el main y lo tengo que completar una vez terminados los TDAs
 
-- fondo.ppm:
+- fondo.ppm: Tiene la imagen de fondo
 
-sprites.bin: 
+sprites.bin: Tiene las letras actuales, las letras siguientes y los numeros para contar (tiempo transcurrido, puntaje y nro de clears)
 
 */
