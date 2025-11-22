@@ -11,7 +11,7 @@
 // SDL2: Me dan el esqueleto, tengo que leer el teclado, dibujar puntos y cambiar el color (se indica donde en test_sdl2.c)
 
 
-// COLORES DEF: Formato SHL (saturacion, gama, luminosidad). E = 0 (rojo), 11 (amarillo), 22 (verde), 44 (azul). ((ver apunte: numeros pseudoaleatorios))
+// COLORES DEF: Formato SHL (saturacion, gama, luminosidad). E = 0 (rojo), 11 (amarillo), 22 (verde), 44 (azul).
 // el 0x00 es el negro y 0xff es el blanco
 
 
