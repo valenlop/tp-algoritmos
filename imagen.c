@@ -287,11 +287,11 @@ imagen_t *imagen_rotar(imagen_t *i){
 
 }
 
-// Por ahora no veo si debe ir en este TDA o en otro
+// Por ahora no veo si debe ir en este TDA o en otro ((PREGUNTAR))
 
-// Si el color viene fijo no sirve de nada (o capaz si) (ver que onda con pieza_crear)
+// Si el color viene fijo no sirve de mucho (o capaz si) (ver que onda con pieza_crear)
 
-imagen_t *imagen_iniciar_color(size_t ancho, size_t alto, color_t color){
+void imagen_iniciar_color(imagen_t *i, color_t color){
     
 }
 

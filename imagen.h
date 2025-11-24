@@ -70,7 +70,7 @@ bool imagen_pegar_no_negros(imagen_t *destino, imagen_t *origen, size_t sf, size
 
 imagen_t *imagen_rotar(imagen_t *i); // Tener en cuenta que crea una imagen nueva rotada
 
-imagen_t *imagen_iniciar_color(size_t ancho, size_t alto, color_t color); // Tendriamos que discutir si va en este TDA o en otro
+void imagen_iniciar_color(imagen_t *i, color_t color); // Tendriamos que discutir si va en este TDA o en otro
 
 
 
