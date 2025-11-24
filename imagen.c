@@ -295,4 +295,12 @@ void imagen_iniciar_color(imagen_t *i, color_t color){
     
 }
 
+size_t imagen_ancho(imagen_t *i){
+    return i->ancho;
+}
+
+size_t imagen_alto(imagen_t *i){   
+    return i->alto;
+}
+
 

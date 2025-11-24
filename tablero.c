@@ -22,3 +22,9 @@ tablero_t *tablero_crear(size_t columnas, size_t filas){
 
     imagen_iniciar_color(tablero_nuevo->tablero, 0x00); // Le paso el color negro
 }
+
+bool tablero_colision(tablero_t *t, pieza_t *p, size_t x, size_t y); // x = columna e y = fila
+
+size_t tablero_linea_formada(tablero_t *t){
+
+}

@@ -72,6 +72,10 @@ imagen_t *imagen_rotar(imagen_t *i); // Tener en cuenta que crea una imagen nuev
 
 void imagen_iniciar_color(imagen_t *i, color_t color); // Tendriamos que discutir si va en este TDA o en otro
 
+size_t imagen_ancho(imagen_t *i);
+
+size_t imagen_alto(imagen_t *i);
+
 
 
 #endif
