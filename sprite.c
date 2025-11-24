@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 struct sprite {
@@ -28,7 +29,7 @@ uint16_t multiplo_de_8(uint16_t ancho){
         return ancho;
     }
     else {
-        return ((ancho + 8) / 8) * 8;
+        return ((ancho + 7) / 8) * 8;
     }
 }
 
@@ -51,7 +52,9 @@ sprite_t *sprite_crear(FILE *fi){
 
     sprite->etiqueta = malloc(20 * sizeof(char));
 
-    for(size_t i = 0; (sprite->etiqueta[i] = etiqueta[i]); i++);
+    memcpy(sprite->etiqueta, etiqueta, 20);
+
+    sprite->etiqueta[19] = '\0';
 
     uint8_t aux[1];
 
@@ -119,8 +122,10 @@ bool sprite_a_pbm(const sprite_t *s, FILE *fo){
                 }
             }
             else {
-                for(size_t d = 0; d < (s->ancho) % 8; d++){
-                    fprintf(fo, "%u\n", ((s->pixeles[f][c]) & (1 << d)) >> d);
+                size_t bits = (s->ancho % 8 == 0) ? 8 : (s->ancho % 8);
+
+                for(size_t d = 0; d < bits; d++){
+                    fprintf(fo, "%u\n", (s->pixeles[f][c] >> d) & 1);
                 }
             }
         }
@@ -162,7 +167,7 @@ bool sprite_obtener(const sprite_t *s, size_t fila, size_t col){
     size_t corcol = col / 8;
     size_t rescol = col % 8;
     
-    return (s->pixeles[fila - 1][corcol]) & (1 << rescol); // Ver si da
+    return ((s->pixeles[fila][corcol] & (1 << rescol)) != 0); // Ver si da
 }
 
 
@@ -171,17 +176,17 @@ bool sprite_obtener(const sprite_t *s, size_t fila, size_t col){
 // (8)
 
 bool sprite_establecer(sprite_t *s, size_t fila, size_t col, bool valor){
-    if(fila <= s->alto && col <= s->ancho){
+    if(fila < s->alto && col < s->ancho){
 
         size_t corcol = col / 8;
         size_t rescol = col % 8;
 
         if(valor){
-            s->pixeles[fila - 1][corcol] = s->pixeles[fila - 1][corcol] | (1 << rescol);
+            s->pixeles[fila][corcol] |= (1 << rescol);
             return true;
         }
         else {
-            s->pixeles[fila - 1][corcol] = s->pixeles[fila - 1][corcol] & (~(1 << rescol));
+            s->pixeles[fila][corcol] &= ~(1 << rescol);
             return true;
         }
     }

@@ -9,6 +9,10 @@
 
 
 struct imagen {
+    // pixeles es un arreglo de arreglos de color_t de una imagen
+    // ancho y alto son el ancho y el alto de una imagen
+    // Si ancho = 0 o alto = 0 <=> pixeles == NULL
+
     color_t **pixeles;
     size_t ancho, alto;
 };
@@ -210,3 +214,85 @@ imagen_t *imagen_leer_ppm(){
 
     return imagen;
 }
+
+
+// Implementacion de lo que falta
+
+
+// Esta funcion concede fila y columna = 0 (sirve para iteraciones)
+
+bool imagen_setear_pixel(imagen_t *i, size_t fila, size_t columna, color_t color){
+    if(i == NULL){
+        return false;
+    }
+    
+    if(fila >= i->alto || columna >= i->ancho){
+        return false;
+    }
+
+    i->pixeles[fila][columna] = color;
+    return true;
+}
+
+// Esta concede fila y columna = 0 (la uso en iteraciones)
+
+color_t imagen_obtener_pixel(imagen_t *i, size_t fila, size_t columna){
+    // Aca voy a asumir que nunca i == NULL y que fila y columna estan en rango
+
+    return i->pixeles[fila][columna];
+}
+
+
+// Toma una imagen y le pega en otra con un offset (util para el tablero), como puede fallar devuelve un bool
+
+bool imagen_pegar_no_negros(imagen_t *destino, imagen_t *origen, size_t sf, size_t sc){
+    if(origen == NULL){
+        return false;
+    }
+
+    if(sf + origen->alto > destino->alto || sc + origen->ancho > destino->ancho){
+        return false;
+    }
+
+    for(size_t f = 0; f < origen->alto; f++){
+        for(size_t c = 0; c < origen->ancho; c++){
+            if(imagen_obtener_pixel(origen, f, c)){
+                destino->pixeles[f + sf][c + sc] = origen->pixeles[f][c];
+            }
+        }
+    }
+
+    return true;
+}
+
+// Deberia andar ((NO LO PROBE))
+
+imagen_t *imagen_rotar(imagen_t *i){
+    if(i == NULL){
+        return NULL;
+    }
+
+    imagen_t *imagen_rotada = imagen_crear(i->alto, i->ancho);
+    if(imagen_rotada == NULL){
+        return NULL;
+    }
+
+    for(size_t f = 0; f < i->alto; f++){
+        for(size_t c = 0; c < i->ancho; c++){
+            imagen_rotada->pixeles[i->ancho - 1 - c][f] = i->pixeles[f][c]; // ((DEBERIA SER ASI))
+        }
+    }
+
+    return imagen_rotada;
+
+}
+
+// Por ahora no veo si debe ir en este TDA o en otro
+
+// Si el color viene fijo no sirve de nada (o capaz si) (ver que onda con pieza_crear)
+
+imagen_t *imagen_iniciar_color(size_t ancho, size_t alto, color_t color){
+    
+}
+
+

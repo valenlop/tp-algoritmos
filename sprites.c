@@ -4,6 +4,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+static char *strdup(const char *s) {
+    size_t n = strlen(s) + 1;
+    char *copy = malloc(n);
+    if (copy == NULL) return NULL;
+    memcpy(copy, s, n);
+    return copy;
+}
+
 
 struct sprites {
 
@@ -46,12 +54,13 @@ sprites_t *sprites_crear(const char *ruta){
         if(sprites->etiquetas == NULL){
             free(sprites->sprites);
             free(sprites);
+            return NULL;
         }
         
         sprites->cant_etiquetas++;
 
         sprites->sprites[0] = sprite;
-        sprites->etiquetas[0] = sprite_etiqueta(sprite);
+        sprites->etiquetas[0] = strdup(sprite_etiqueta(sprite));
         
         
         
@@ -64,7 +73,7 @@ sprites_t *sprites_crear(const char *ruta){
     
     while((sprite = sprite_crear(f)) != NULL){
 
-        sprite_t **aux = realloc(sprites->sprites, sizeof(sprites->sprites) * (sprites->cant_sprites + 1));
+        sprite_t **aux = realloc(sprites->sprites, sizeof(sprite_t *) * (sprites->cant_sprites + 1));
         if(aux == NULL){
             sprites_destruir(sprites);
             return NULL;
@@ -76,7 +85,7 @@ sprites_t *sprites_crear(const char *ruta){
 
         sprites->cant_sprites++;
 
-        char **aux2 = realloc(sprites->etiquetas, sizeof(sprites->etiquetas) * (sprites->cant_etiquetas + 1));
+        char **aux2 = realloc(sprites->etiquetas, sizeof(char *) * (sprites->cant_etiquetas + 1));
         if(aux2 == NULL){
             sprites_destruir(sprites);
             return NULL;
@@ -84,7 +93,7 @@ sprites_t *sprites_crear(const char *ruta){
 
         sprites->etiquetas = aux2;
 
-        sprites->etiquetas[sprites->cant_etiquetas] = sprite_etiqueta(sprite);
+        sprites->etiquetas[sprites->cant_etiquetas] = strdup(sprite_etiqueta(sprite));
 
         sprites->cant_etiquetas++;
     }
@@ -103,6 +112,10 @@ void sprites_destruir(sprites_t *ss){
     }
 
     free(ss->sprites);
+
+    for(size_t e = 0; e < ss->cant_etiquetas; e++){
+        free(ss->etiquetas[e]);
+    }
 
     free(ss->etiquetas);
 
