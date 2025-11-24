@@ -1,5 +1,5 @@
 
-// TDA: Extraer sprites de un archivo binario
+// TDA: Laburar con sprites ((Terminado))
 
 #ifndef SPRITES_H
 #define SPRITES_H

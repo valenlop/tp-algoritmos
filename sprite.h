@@ -1,4 +1,6 @@
 
+// TDA: Laburar un sprite ((Terminado))
+
 #ifndef SPRITE_H
 #define SPRITE_H
 
