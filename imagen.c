@@ -19,7 +19,7 @@ struct imagen {
 
 
 
-// (8) 
+// (1) 
 
 void imagen_destruir(imagen_t *i){
 
@@ -33,7 +33,7 @@ void imagen_destruir(imagen_t *i){
     free(i);
 }
 
-// (7)
+// (2)
 
 imagen_t *imagen_crear(size_t ancho, size_t alto){
 
@@ -65,7 +65,7 @@ imagen_t *imagen_crear(size_t ancho, size_t alto){
    return im;
 }
 
-// (9)
+// (3)
 
 imagen_t *imagen_clonar(const imagen_t *i){
 
@@ -84,7 +84,7 @@ imagen_t *imagen_clonar(const imagen_t *i){
     return copia;
 }
 
-// (10)
+// (4)
 
 void imagen_escribir_ppm(const imagen_t *i){
     
@@ -114,7 +114,7 @@ void imagen_escribir_ppm(const imagen_t *i){
 }
 
 
-// (11)
+// (5)
 
 imagen_t *imagen_leer_ppm(){
 
@@ -218,6 +218,7 @@ imagen_t *imagen_leer_ppm(){
 
 // Implementacion de lo que falta
 
+// (6)
 
 // Esta funcion concede fila y columna = 0 (sirve para iteraciones)
 
@@ -234,6 +235,8 @@ bool imagen_setear_pixel(imagen_t *i, size_t fila, size_t columna, color_t color
     return true;
 }
 
+// (7)
+
 // Esta concede fila y columna = 0 (la uso en iteraciones)
 
 color_t imagen_obtener_pixel(imagen_t *i, size_t fila, size_t columna){
@@ -242,6 +245,7 @@ color_t imagen_obtener_pixel(imagen_t *i, size_t fila, size_t columna){
     return i->pixeles[fila][columna];
 }
 
+// (8)
 
 // Toma una imagen y le pega en otra con un offset (util para el tablero), como puede fallar devuelve un bool
 
@@ -265,6 +269,8 @@ bool imagen_pegar_no_negros(imagen_t *destino, imagen_t *origen, size_t sf, size
     return true;
 }
 
+// (9)
+
 // Deberia andar ((NO LO PROBE))
 
 imagen_t *imagen_rotar(imagen_t *i){
@@ -287,17 +293,28 @@ imagen_t *imagen_rotar(imagen_t *i){
 
 }
 
+// (10)
+
 // Por ahora no veo si debe ir en este TDA o en otro ((PREGUNTAR))
 
-// Si el color viene fijo no sirve de mucho (o capaz si) (ver que onda con pieza_crear)
+// Si el color viene fijo no sirve de mucho (o capaz si) (Por ahora solo para iniciar el tablero sirve)
 
 void imagen_iniciar_color(imagen_t *i, color_t color){
-    
+
+    for(size_t f = 0; f < i->alto; f++){
+        for(size_t c = 0; c < i->ancho; c++){
+            i->pixeles[f][c] = color;
+        }
+    }
 }
+
+// (11)
 
 size_t imagen_ancho(imagen_t *i){
     return i->ancho;
 }
+
+// (12)
 
 size_t imagen_alto(imagen_t *i){   
     return i->alto;
