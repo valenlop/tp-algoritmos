@@ -46,7 +46,7 @@ bool tablero_perdio(tablero_t *t, pieza_t *p){
     }
 }
 
-// (4) Me fijo en cada pixel de color si abajo tiene arena, puede fallar en temas de logica
+// (4) Me fijo en cada pixel de color si abajo tiene arena, puede fallar en temas de logica (faltaria ver que onda si choca con el piso)
 
 bool tablero_colision(tablero_t *t, pieza_t *p){ // x = columna e y = fila,  Del TDA pieza_h puedo saber la posicion de p
 
