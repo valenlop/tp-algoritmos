@@ -23,7 +23,7 @@ struct pieza {
     size_t alto;
 };
 
-//FUNCIONES STATIC
+//FUNCIONES STATIC: Ambas funciones en el main deben inicializarse con srand(time(NULL))
 
 static e_color_t random_e() {
     e_color_t colores[4] = {E_ROJO, E_VERDE, E_AZUL, E_AMARILLO};
