@@ -44,9 +44,18 @@ bool tablero_pegar_pieza(tablero_t *t, pieza_t *p); // // Del TDA pieza_h puedo 
 
 void tablero_simular_arena(tablero_t *t);
 
+// (7) tablero_linea_formada: Me indica si se forma una linea para incrementar puntaje, clears y mas. El tablero vuelve con el bloque eliminado.
 
-// (7) tablero_linea_formada: Recursiva, revisar que si se forma una linea hay que eliminar la linea
+bool tablero_linea_formada(tablero_t *t, size_t *puntaje);
 
-size_t tablero_linea_formada(tablero_t *t);
+// (8) Getter
+
+size_t tablero_alto(tablero_t *t);
+
+// (9) Getter
+
+size_t tablero_ancho(tablero_t *t);
+
+
 
 #endif

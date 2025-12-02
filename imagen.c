@@ -220,29 +220,29 @@ imagen_t *imagen_leer_ppm(){
 
 // (6)
 
-// Esta funcion concede fila y columna = 0 (sirve para iteraciones)
+// 
 
 bool imagen_setear_pixel(imagen_t *i, size_t fila, size_t columna, color_t color){
     if(i == NULL){
         return false;
     }
     
-    if(fila >= i->alto || columna >= i->ancho){
+    if(fila == 0 || fila > i->alto || columna == 0 || columna > i->ancho){
         return false;
     }
 
-    i->pixeles[fila][columna] = color;
+    i->pixeles[fila - 1][columna - 1] = color;
     return true;
 }
 
 // (7)
 
-// Esta concede fila y columna = 0 (la uso en iteraciones)
+// 
 
 color_t imagen_obtener_pixel(imagen_t *i, size_t fila, size_t columna){
     // Aca voy a asumir que nunca i == NULL y que fila y columna estan en rango
 
-    return i->pixeles[fila][columna];
+    return i->pixeles[fila - 1][columna - 1];
 }
 
 // (8)
@@ -251,7 +251,7 @@ color_t imagen_obtener_pixel(imagen_t *i, size_t fila, size_t columna){
 
 bool imagen_pegar_no_negros(imagen_t *destino, imagen_t *origen, size_t sf, size_t sc){
     if(origen == NULL){
-        return false;
+        return true; // Si la imagen de origen no existe, retorno sin cambiar la imagen destino
     }
 
     if(sf + origen->alto > destino->alto || sc + origen->ancho > destino->ancho){
@@ -260,7 +260,7 @@ bool imagen_pegar_no_negros(imagen_t *destino, imagen_t *origen, size_t sf, size
 
     for(size_t f = 0; f < origen->alto; f++){
         for(size_t c = 0; c < origen->ancho; c++){
-            if(imagen_obtener_pixel(origen, f, c)){
+            if(imagen_obtener_pixel(origen, f + 1, c + 1)){
                 destino->pixeles[f + sf][c + sc] = origen->pixeles[f][c];
             }
         }

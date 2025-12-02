@@ -125,6 +125,8 @@ color_t pieza_get_color(const pieza_t *p) {
     return p->def;
 }
 
+// No admite x == 0 o y == 0
+
 color_t pieza_color_pixel(const pieza_t *p, size_t x, size_t y) {
     return imagen_obtener_pixel(p->img, x, y);
 }
