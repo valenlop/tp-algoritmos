@@ -22,7 +22,9 @@ imagen_t *imagen_clonar(const imagen_t *i); // (3)
 
 void imagen_escribir_ppm(const imagen_t *i); // (4)
 
-imagen_t *imagen_leer_ppm(); // (5)
+// Lee de f una imagen en formato PPM RGB de 24 bits y la carga en memoria
+
+imagen_t *imagen_leer_ppm(FILE *f); // (5) Creo que la acomode para leer de un archivo
 
 
 // Esta parte es matriz.h, falta adaptar estas funciones si es necesario

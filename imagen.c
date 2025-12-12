@@ -114,15 +114,15 @@ void imagen_escribir_ppm(const imagen_t *i){
 }
 
 
-// (5)
+// (5) // Deberia estar acomodado para leer de un archivo
 
-imagen_t *imagen_leer_ppm(){
+imagen_t *imagen_leer_ppm(FILE *f){
 
 
     char aux[100];
     char aux2[100];
 
-    while(fgets(aux, 100, stdin) != NULL){
+    while(fgets(aux, 100, f) != NULL){
         
         if(aux[0] == '#'){
             continue;
@@ -136,7 +136,7 @@ imagen_t *imagen_leer_ppm(){
     }
 
 
-    while(fgets(aux, 100, stdin) != NULL){
+    while(fgets(aux, 100, f) != NULL){
         
         if(aux[0] == '#'){
             continue;
@@ -168,7 +168,7 @@ imagen_t *imagen_leer_ppm(){
 
     imagen_t *imagen = imagen_crear(ancho, alto); 
 
-    while(fgets(aux, 100, stdin) != NULL){
+    while(fgets(aux, 100, f) != NULL){
         if(aux[0] == '#'){
             continue;
         }
@@ -191,17 +191,17 @@ imagen_t *imagen_leer_ppm(){
             int b;
 
 
-            while(fgets(aux, 100, stdin) != NULL){
+            while(fgets(aux, 100, f) != NULL){
                     if(aux[0] == '#'){
                         continue;
                     }
                     else {
                     r = atoi(aux);
                     
-                    fgets(aux, 100, stdin);
+                    fgets(aux, 100, f);
                     g = atoi(aux);
                     
-                    fgets(aux, 100, stdin);
+                    fgets(aux, 100, f);
                     b = atoi(aux);
 
                     break;

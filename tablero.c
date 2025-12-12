@@ -1,3 +1,5 @@
+// Revisar ((Va a andar mal simular_arena y linea_formada))
+
 // Implementacion firmas de tablero.h
 
 #include "tablero.h"
@@ -5,6 +7,9 @@
 #include <stdio.h>
 
 struct tablero {
+    // tablero es la imagen que representara al tablero del juego
+    // Si tablero == NULL (no pasara nunca)
+
     imagen_t *tablero; // Parece que solo agregamos un puntero mas
 };
 
@@ -36,10 +41,10 @@ void tablero_destruir(tablero_t *t){
     free(t);
 }
 
-// (3) Deberia ser asi de basico, pero podria faltar algo
+// (3) Deberia ser asi de basico, pero podria faltar algo (Ojo con donde es el cero de la pieza)
 
 bool tablero_perdio(tablero_t *t, pieza_t *p){
-    if(tablero_colision(t, p) && pieza_get_y(p) == 0){
+    if(tablero_colision(t, p) && pieza_get_columna(p) == 0){
         return true;
     }
 
@@ -50,18 +55,18 @@ bool tablero_perdio(tablero_t *t, pieza_t *p){
 
 // (4) Me fijo en cada pixel de color si abajo tiene arena, puede fallar en temas de logica
 
-bool tablero_colision(tablero_t *t, pieza_t *p){ // x = columna e y = fila,  Del TDA pieza_h puedo saber la posicion de p
+bool tablero_colision(tablero_t *t, pieza_t *p){
 
-    size_t ubicacion_x = pieza_get_x(p);
-    size_t ubicacion_y = pieza_get_y(p);
+    size_t columna = pieza_get_columna(p);
+    size_t fila = pieza_get_fila(p);
 
-    if(ubicacion_y + pieza_alto(p) == tablero_alto(t)){
+    if(fila + pieza_alto(p) == tablero_alto(t)){
         return true;
     }
 
-    for(size_t f = ubicacion_y; f < pieza_alto(p) + ubicacion_y; f++){
-        for(size_t c = ubicacion_x; c < pieza_ancho(p) + ubicacion_x; c++){
-            if(pieza_color_pixel(p, c - ubicacion_x + 1, f - ubicacion_y + 1) != 0 && imagen_obtener_pixel(t->tablero, f + 1, c) != 0){
+    for(size_t f = fila; f < pieza_alto(p) + fila; f++){
+        for(size_t c = columna; c < pieza_ancho(p) + columna; c++){
+            if(pieza_color_pixel(p, f - fila + 1, c - columna + 1) != 0 && imagen_obtener_pixel(t->tablero, f + 1, c) != 0){
                 return true;
             }
         }
@@ -76,7 +81,7 @@ bool tablero_colision(tablero_t *t, pieza_t *p){ // x = columna e y = fila,  Del
 
 bool tablero_pegar_pieza(tablero_t *t, pieza_t *p){
     
-    return imagen_pegar_no_negros(t->tablero, pieza_get_imagen(p), pieza_get_y(p), pieza_get_x(p));
+    return imagen_pegar_no_negros(t->tablero, pieza_get_imagen(p), pieza_get_fila(p), pieza_get_columna(p)); // Ojo aca con pegar los que no son
 }
 
 // (6) Tiene algunas situaciones particulares donde se pisan los pixeles que se mueven (solucionar mas adelante). 

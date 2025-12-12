@@ -21,7 +21,13 @@ void sprite_destruir(sprite_t *s);
 
 size_t sprite_ancho(const sprite_t *s);
 size_t sprite_alto(const sprite_t *s);
+
+// Obtener etiqueta del sprite
+
 char *sprite_etiqueta(const sprite_t *s);
+
+// Obtener el valor de un pixel 
+
 bool sprite_obtener(const sprite_t *s, size_t fila, size_t col);
 
 // Setters

@@ -10,7 +10,7 @@
 
 typedef struct sprites sprites_t;
 
-// Constructor
+// Construye un contenedor con todos los sprites adentro
 
 sprites_t *sprites_crear(const char *ruta);
 
@@ -22,7 +22,7 @@ void sprites_destruir(sprites_t *ss);
 
 size_t sprites_cantidad(const sprites_t *ss);
 
-// Primitiva
+// Dada la etiqueta de un sprite devuelve el sprite
 
 sprite_t *sprites_obtener(const sprites_t *ss, const char *etiqueta);
 

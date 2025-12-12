@@ -7,6 +7,7 @@
 #include "config.h"
 
 #include "imagen.h"
+#include "juego.h"
 
 int main(int argc, char *argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
@@ -24,9 +25,23 @@ int main(int argc, char *argv[]) {
     int dormir = 0;
 
     // BEGIN código del alumno
-    FILE *f = fopen("fondo.ppm", "rt");
-    imagen_t *im = imagen_leer_ppm(f);
-    fclose(f);
+    FILE *fondo = fopen("fondo.ppm", "rt");
+    if(fondo == NULL){
+        fprintf(stderr, "La cago el fondo");
+        return 1;
+    }
+
+    imagen_t *im_fondo = imagen_leer_ppm(fondo); // Esto puede fallar (chequearlo)
+
+    fclose(fondo);
+
+    sprites_t *figuras = sprites_crear("sprites.bin");
+
+    
+
+    juego_t *juego = juego_crear(im_fondo, figuras); // Esto puede fallar (chequearlo)
+
+    
 
     int fi = 0;
     int ci = 0;
