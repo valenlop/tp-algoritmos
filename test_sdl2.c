@@ -6,7 +6,6 @@
 
 #include "config.h"
 
-#include "imagen.h"
 #include "juego.h"
 
 int main(int argc, char *argv[]) {
@@ -31,7 +30,12 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    imagen_t *im_fondo = imagen_leer_ppm(fondo); // Esto puede fallar (chequearlo)
+    imagen_t *im_fondo = imagen_leer_ppm(fondo);
+    if(im_fondo == NULL){
+        fclose(fondo);
+        fprintf(stderr, "im_fondo la cago");
+        return 1;
+    }
 
     fclose(fondo);
 
@@ -39,21 +43,39 @@ int main(int argc, char *argv[]) {
 
     
 
-    juego_t *juego = juego_crear(im_fondo, figuras); // Esto puede fallar (chequearlo)
+    juego_t *juego = juego_crear(im_fondo, figuras);
+    if(juego == NULL){
+        sprites_destruir(figuras);
+        fprintf(stderr, "Fallo crear juego");
+        return 1;
+    }
 
-    
-
-    int fi = 0;
-    int ci = 0;
     // END código del alumno
 
     unsigned int ticks = SDL_GetTicks();
+
+    uint32_t tiempo_inicio = SDL_GetTicks(); // Para calcular el tiempo
+
     while(1) {
         if(SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)
                 break;
 
             // BEGIN código del alumno
+
+            uint32_t ahora = SDL_GetTicks(); // Para calcular el tiempo {}
+            uint32_t transcurrido = ahora - tiempo_inicio;
+
+            uint32_t minutos = transcurrido / 60000;
+            uint32_t segundos = (transcurrido % 60000) / 1000;
+            uint32_t milisegundos = transcurrido % 1000; // Para calcular el tiempo {}
+
+            juego_setear_minutos(juego, minutos);
+            juego_setear_segundos(juego, segundos);
+            juego_setear_milisegundos(juego, milisegundos);
+
+            // Tiempo ya seteado
+
             if (event.type == SDL_KEYDOWN) {
                 // Se apretó una tecla
                 switch(event.key.keysym.sym) {
@@ -107,7 +129,9 @@ int main(int argc, char *argv[]) {
     }
 
     // BEGIN código del alumno
-    imagen_destruir(im);
+
+    juego_destruir(juego); // Libero toda la memoria asociada al juego y listo
+
     // END código del alumno
 
     SDL_DestroyRenderer(renderer);

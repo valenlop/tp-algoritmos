@@ -26,16 +26,6 @@ void imagen_escribir_ppm(const imagen_t *i); // (4)
 
 imagen_t *imagen_leer_ppm(FILE *f); // (5) Creo que la acomode para leer de un archivo
 
-
-// Esta parte es matriz.h, falta adaptar estas funciones si es necesario
-
-// Tengo imagen_pegar_no_negros que es mas especifica, como esta seria general considero reutilizarla si veo que me puede servir
-
-bool pegar_submatriz(size_t mfs, size_t mcs, char matriz[mfs][mcs], size_t sfs, size_t scs, char submatriz[sfs][scs], size_t fi, size_t ci);
-
-// Final matriz.h
-
-
 bool imagen_setear_pixel(imagen_t *i, size_t fila, size_t columna, color_t color); // (6)
 
 color_t imagen_obtener_pixel(imagen_t *i, size_t fila, size_t columna); // (7)

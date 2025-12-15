@@ -24,6 +24,6 @@ size_t sprites_cantidad(const sprites_t *ss);
 
 // Dada la etiqueta de un sprite devuelve el sprite
 
-sprite_t *sprites_obtener(const sprites_t *ss, const char *etiqueta);
+sprite_t *sprites_obtener(const sprites_t *ss, const char *etiqueta); // Voy a usar esta para obtener los sprites de puntaje, clears, tiempo , tubo y piezas
 
 #endif

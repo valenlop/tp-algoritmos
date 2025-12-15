@@ -37,7 +37,7 @@ bool tablero_colision(tablero_t *t, pieza_t *p); // Del TDA pieza_h puedo saber 
 
 // (5) tablero_pegar_pieza: usar "imagen_pegar_no_negros": Deberia recibir una pieza y pegar la imagen de la pieza en el tablero
 
-bool tablero_pegar_pieza(tablero_t *t, pieza_t *p); // // Del TDA pieza_h puedo saber la posicion de p
+bool tablero_pegar_pieza(tablero_t *t, pieza_t *p);
 
 
 // (6) tablero_simular_arena: Solo modifica los pixeles de un tablero
@@ -55,6 +55,10 @@ size_t tablero_alto(tablero_t *t);
 // (9) Getter
 
 size_t tablero_ancho(tablero_t *t);
+
+// (10) Getter
+
+imagen_t *tablero_imagen(tablero_t *t);
 
 
 

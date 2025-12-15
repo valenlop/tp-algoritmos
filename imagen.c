@@ -227,11 +227,11 @@ bool imagen_setear_pixel(imagen_t *i, size_t fila, size_t columna, color_t color
         return false;
     }
     
-    if(fila == 0 || fila > i->alto || columna == 0 || columna > i->ancho){
+    if(fila >= i->alto || columna >= i->ancho){
         return false;
     }
 
-    i->pixeles[fila - 1][columna - 1] = color;
+    i->pixeles[fila][columna] = color;
     return true;
 }
 
@@ -242,7 +242,7 @@ bool imagen_setear_pixel(imagen_t *i, size_t fila, size_t columna, color_t color
 color_t imagen_obtener_pixel(imagen_t *i, size_t fila, size_t columna){
     // Aca voy a asumir que nunca i == NULL y que fila y columna estan en rango
 
-    return i->pixeles[fila - 1][columna - 1];
+    return i->pixeles[fila][columna];
 }
 
 // (8)

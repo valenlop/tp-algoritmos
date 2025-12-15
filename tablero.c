@@ -316,3 +316,8 @@ size_t tablero_alto(tablero_t *t){
 size_t tablero_ancho(tablero_t *t){
     return imagen_ancho(t->tablero);
 }
+
+
+imagen_t *tablero_imagen(tablero_t *t){
+    return t->tablero;
+}
