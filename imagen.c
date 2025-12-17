@@ -166,7 +166,8 @@ imagen_t *imagen_leer_ppm(FILE *f){
         
 
 
-    imagen_t *imagen = imagen_crear(ancho, alto); 
+    imagen_t *imagen = imagen_crear(ancho, alto);
+    if(imagen == NULL) return NULL;
 
     while(fgets(aux, 100, f) != NULL){
         if(aux[0] == '#'){
@@ -183,7 +184,7 @@ imagen_t *imagen_leer_ppm(FILE *f){
     }
 
 
-    for(size_t f = 0; f < alto; f++){
+    for(size_t fi = 0; fi < alto; fi++){
         for(size_t c = 0; c < ancho; c++){
             
             int r;
@@ -208,7 +209,7 @@ imagen_t *imagen_leer_ppm(FILE *f){
                     }
 
             }
-            imagen->pixeles[f][c] = color_desde_rgb(r, g, b);
+            imagen->pixeles[fi][c] = color_desde_rgb(r, g, b);
         }
     }
 
@@ -240,7 +241,9 @@ bool imagen_setear_pixel(imagen_t *i, size_t fila, size_t columna, color_t color
 // 
 
 color_t imagen_obtener_pixel(imagen_t *i, size_t fila, size_t columna){
-    // Aca voy a asumir que nunca i == NULL y que fila y columna estan en rango
+    assert(i);
+    assert(fila < i->alto);
+    assert(columna < i->ancho);
 
     return i->pixeles[fila][columna];
 }
@@ -260,8 +263,14 @@ bool imagen_pegar_no_negros(imagen_t *destino, imagen_t *origen, size_t sf, size
 
     for(size_t f = 0; f < origen->alto; f++){
         for(size_t c = 0; c < origen->ancho; c++){
-            if(imagen_obtener_pixel(origen, f + 1, c + 1)){
-                destino->pixeles[f + sf][c + sc] = origen->pixeles[f][c];
+
+            color_t px = imagen_obtener_pixel(origen, f, c);
+            if(px){
+
+                assert(f + sf < destino->alto);
+                assert(c + sc < destino->ancho);
+                
+                imagen_setear_pixel(destino, f + sf, c + sc, px);
             }
         }
     }
@@ -320,4 +329,25 @@ size_t imagen_alto(imagen_t *i){
     return i->alto;
 }
 
+bool imagen_pegar(imagen_t *destino, imagen_t *origen, size_t fila, size_t columna){
+    if (destino == NULL || origen == NULL)
+        return false;
 
+    size_t alto_d = imagen_alto(destino);
+    size_t ancho_d = imagen_ancho(destino);
+
+    size_t alto_s = imagen_alto(origen);
+    size_t ancho_s = imagen_ancho(origen);
+
+    if (fila + alto_s > alto_d || columna + ancho_s > ancho_d)
+        return false;
+
+    for (size_t f = 0; f < alto_s; f++) {
+        for (size_t c = 0; c < ancho_s; c++) {
+            color_t color = imagen_obtener_pixel(origen, f, c);
+            imagen_setear_pixel(destino, fila + f, columna + c, color);
+        }
+    }
+
+    return true;
+}

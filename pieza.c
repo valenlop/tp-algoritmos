@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #include "pieza.h"
 #include "imagen.h"
@@ -26,7 +27,7 @@ struct pieza {
     // Si tetramino == NULL entonces fila y columna no deberian existir
     // forma es claro que es la forma de la pieza "i", "o", "s", "z", "t"...
 
-    char *forma; 
+    const char *forma; 
     imagen_t *tetramino;
     size_t fila; 
     size_t columna;
@@ -39,12 +40,21 @@ static e_color_t random_e() {
     return colores[rand() % 4];
 }
 
-static color_t color_random(e) {
+static color_t color_random(uint8_t e) {
     uint8_t d = 12 + (rand() % 8);
     uint8_t f = 12 + (rand() % 8);
-    uint8_t e = e;
 
     return color_desde_def(d, e, f);
+}
+
+// Matcheo entre version grande y chica
+
+static const char *forma_chica_desde_grande(const char *g) {
+    for (size_t i = 0; i < 7; i++){
+        if(strcmp(formas[i], g) == 0)
+            return formas_chicas[i];
+    }
+    return NULL;
 }
 
 //FUNCIONES PUBLICAS
@@ -63,6 +73,11 @@ pieza_t *pieza_crear(sprites_t *tetraminos) {
 
     sprite_t *tetramino = sprites_obtener(tetraminos, p->forma);
 
+    if(tetramino == NULL){
+        free(p);
+        return NULL;
+    }
+
     p->tetramino = imagen_crear(sprite_ancho(tetramino), sprite_alto(tetramino));
     if(p->tetramino == NULL){
         free(p);
@@ -75,7 +90,7 @@ pieza_t *pieza_crear(sprites_t *tetraminos) {
 
     for(size_t f = 0; f < sprite_alto(tetramino); f++){
         for(size_t c = 0; c < sprite_ancho(tetramino); c++){
-            if(! sprite_obtener(tetramino, f, c)){ // sprite_obtener es 0-based
+            if(sprite_obtener(tetramino, f, c)){ // sprite_obtener es 0-based
                 imagen_setear_pixel(p->tetramino, f, c, color_random(e)); // imagen_setear_pixel esta en 0-based (anda bien)
             }
             else{
@@ -112,6 +127,8 @@ size_t pieza_get_columna(const pieza_t *p){
 }
 
 color_t pieza_color_pixel(pieza_t *p, size_t fila, size_t columna) {
+    if(p == NULL || p->tetramino == NULL) 
+        return 0;
     return imagen_obtener_pixel(p->tetramino, fila, columna);
 }
 
@@ -144,10 +161,24 @@ void pieza_mover_fila(pieza_t *p, size_t cantidad) {
     p->fila += cantidad;
 }
 
-// Asumo que sera mover una cantidad y desde donde esta
+// Cantidad puede ser positivo o negativo (izquierda o derecha)
 
-void pieza_mover_columna(pieza_t *p, size_t cantidad) {
-    p->columna += cantidad;
+void pieza_mover_columna(pieza_t *p, int cantidad) {
+    if(cantidad < 0){
+        size_t mod = -cantidad;
+        if(p->columna < mod)
+            p->columna = 0;
+        else{
+            p->columna -= mod;
+        }
+    }
+    else{
+        if(p->columna + pieza_ancho(p) + cantidad > 80)
+            p->columna = 80 - pieza_ancho(p); // Flojo esto, pero es lo que se me ocurrio
+        else {
+            p->columna += cantidad;
+        }
+    }
 }
 
 void pieza_set_posicion(pieza_t *p, size_t fila, size_t columna) { // Podriamos verificar que la posicion (x,y) es factible
@@ -170,47 +201,47 @@ bool pieza_rotar(pieza_t *p){
     return true;
 }
 
-// Para saber la forma de la pieza (la dejo pero creo que no sirve)
-
-char *pieza_forma(pieza_t *p){
-    return p->forma;
-}
+// Terminar de desarrollar
 
 pieza_t *pieza_a_version_chica(pieza_t *p, sprites_t *ss){
     pieza_t *pieza_chica = malloc(sizeof(pieza_t));
     if(pieza_chica == NULL) return NULL;
 
-    pieza_chica->forma = malloc(sizeof(char) * 3);
-    if(p->forma == NULL){
+    pieza_chica->forma = forma_chica_desde_grande(p->forma);
+    
+    sprite_t *s_chico = sprites_obtener(ss, pieza_chica->forma);
+    if(s_chico == NULL){
         free(pieza_chica);
         return NULL;
     }
 
-    pieza_chica->forma = forma_chica_desde_grande(p->forma);
-    
-    sprite_t *s_chico = sprites_obtener(ss, pieza_chica->forma);
+    pieza_chica->tetramino = imagen_crear(sprite_ancho(s_chico), sprite_alto(s_chico));
+    if(pieza_chica->tetramino == NULL){
+        free(pieza_chica);
+        return NULL;
+    }
 
-    pieza_chica->tetramino = imagen_crear(sprite_ancho(s_chico), sprite_alto(s_chico)); // Tal vez deba chequear que pudo
+    for(size_t f = 0; f < sprite_alto(s_chico); f++){
+        for(size_t c = 0; c < sprite_ancho(s_chico); c++){
+            if(sprite_obtener(s_chico, f, c)){ 
+                imagen_setear_pixel(pieza_chica->tetramino, f, c, 0xff); 
+            }
+            else{
+                imagen_setear_pixel(pieza_chica->tetramino, f, c, 0x00);
+            }
+        }
+    }
 
-    pieza_colorear(pieza_chica, 0xff, false); // Coloreo de blanco sin random
+    // Falta generar un apartado especial para las ubicaciones (no todas quedan bien centradas)
 
-    pieza_chica->fila = ; // Faltan los offset de esta pieza
+    pieza_chica->fila = 8 * 3; // Faltan los offset de esta pieza
 
-    pieza_chica->columna = ;
+    pieza_chica->columna = 8 * 16;
 
     return pieza_chica;
 
 }
 
-// Matcheo entre version grande y chica
-
-static const char *forma_chica_desde_grande(const char *g) {
-    for (size_t i = 0; i < 7; i++){
-        if(strcmp(formas[i], g) == 0)
-            return formas_chicas[i];
-    }
-    return NULL;
-}
 
 pieza_t *pieza_crear_tubo(pieza_t *p, sprites_t *ss){
     
@@ -229,21 +260,21 @@ pieza_t *pieza_crear_tubo(pieza_t *p, sprites_t *ss){
     
     // Aca laburo con su color
 
-    e_color_t e = color_e(imagen_obtener_pixel(p->tetramino, 1, 1));
+    e_color_t e = color_e(imagen_obtener_pixel(p->tetramino, 1, 1)); 
 
     for(size_t f = 0; f < sprite_alto(s_tubo); f++){
-        for(size_t c = 0; c < sprite_ancho(tubo); c++){
-            if(! sprite_obtener(s_tubo, f, c)){ // sprite_obtener es 0-based
-                imagen_setear_pixel(p->tetramino, f, c, color_random(e)); // imagen_setear_pixel esta en 0-based (anda bien)
+        for(size_t c = 0; c < sprite_ancho(s_tubo); c++){
+            if(sprite_obtener(s_tubo, f, c)){ 
+                imagen_setear_pixel(tubo->tetramino, f, c, color_random(e));
             }
             else{
-                imagen_setear_pixel(p->tetramino, f, c, 0x00);
+                imagen_setear_pixel(tubo->tetramino, f, c, 0x00);
             }
         }
     }
 
-    tubo->fila = ; // Faltan los offset del tubo
-    tubo->columna = ;
+    tubo->fila = 8 * 6 - 3; // Faltan los offset del tubo
+    tubo->columna = 8 * 15 + 1;
     tubo->forma = NULL;
 
     return tubo;
@@ -267,9 +298,9 @@ pieza_t *pieza_crear_dos_puntos(sprites_t *ss){
     // Aca laburo con su color
 
     for(size_t f = 0; f < sprite_alto(s_dos_puntos); f++){
-        for(size_t c = 0; c < sprite_ancho(dos_puntos); c++){
-            if(! sprite_obtener(s_dos_puntos, f, c)){ // sprite_obtener es 0-based
-                imagen_setear_pixel(dos_puntos->tetramino, f, c, 0xff); // Color blanco
+        for(size_t c = 0; c < sprite_ancho(s_dos_puntos); c++){
+            if(sprite_obtener(s_dos_puntos, f, c)){ 
+                imagen_setear_pixel(dos_puntos->tetramino, f, c, 0xff); 
             }
             else{
                 imagen_setear_pixel(dos_puntos->tetramino, f, c, 0x00);
@@ -277,8 +308,8 @@ pieza_t *pieza_crear_dos_puntos(sprites_t *ss){
         }
     }
 
-    dos_puntos->fila = ; // Faltan los offset de los dos puntos
-    dos_puntos->columna = ;
+    dos_puntos->fila = 8 * 8 + 1; // Faltan los offset de los dos puntos
+    dos_puntos->columna = 8 * 13 + 11;
     dos_puntos->forma = NULL;
 
     return dos_puntos;

@@ -139,14 +139,14 @@ bool sprite_a_pbm(const sprite_t *s, FILE *fo){
 
 // (4)
 
-size_t sprite_ancho(const sprite_t *s){
+size_t sprite_ancho(sprite_t *s){
     return s->ancho;
 }
 
 
 // (5)
 
-size_t sprite_alto(const sprite_t *s){
+size_t sprite_alto(sprite_t *s){
     return s->alto;
 }
 

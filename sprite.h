@@ -19,8 +19,8 @@ void sprite_destruir(sprite_t *s);
 
 // Getters
 
-size_t sprite_ancho(const sprite_t *s);
-size_t sprite_alto(const sprite_t *s);
+size_t sprite_ancho(sprite_t *s);
+size_t sprite_alto(sprite_t *s);
 
 // Obtener etiqueta del sprite
 

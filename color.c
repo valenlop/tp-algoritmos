@@ -2,6 +2,7 @@
 #include "color.h"
 
 #include <math.h>
+#include <stdlib.h>
 
 #define SHIFT_F 5 
 #define SHIFT_E 6

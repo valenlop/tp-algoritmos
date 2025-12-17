@@ -51,7 +51,11 @@ bool juego_terminado(juego_t *j);
 // La pieza siguiente que le paso tiene que estar bien dimensionada
 void juego_setear_pieza_actual(juego_t *j, pieza_t *pieza_siguiente_real);
 
+void juego_setar_pieza_siguiente(juego_t *j, pieza_t *pieza_creada);
+
 void juego_aumentar_nro_clears(juego_t *j);
+
+void juego_aumentar_puntaje(juego_t *j, size_t cantidad);
 
 void juego_aumentar_velocidad_actual(juego_t *j);
 
