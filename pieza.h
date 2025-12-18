@@ -1,4 +1,3 @@
-// Revisar (( No se si esta terminado))
 
 //TDA: Trabajo con la pieza
 
@@ -26,7 +25,7 @@ void pieza_destruir(pieza_t *p);
 
 imagen_t *pieza_get_imagen(const pieza_t *p);
 
-size_t pieza_get_fila(const pieza_t *p);
+size_t pieza_get_fila(pieza_t *p);
 
 size_t pieza_get_columna(const pieza_t *p);
 
@@ -45,8 +44,6 @@ void pieza_colorear(pieza_t *p, color_t color, bool random);
 void pieza_mover_fila(pieza_t *p, size_t cantidad);
 
 void pieza_mover_columna(pieza_t *p, int cantidad);
-
-void pieza_set_posicion(pieza_t *p, size_t fila, size_t columna); // Quizas sirva
 
 bool pieza_rotar(pieza_t *p);
 

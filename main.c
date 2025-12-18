@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 
     // BEGIN código del alumno
 
-    srand((unsigned)time(NULL));
+    srand((unsigned)time(NULL)); // Inicio la semilla para random
 
     FILE *fondo = fopen("fondo.ppm", "rt");
     if(fondo == NULL){
@@ -54,27 +54,28 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    int mover_izq = 0;
+
+    int mover_der = 0;
+
+    int caer_rapido = 0;
+
+    
+
+    double delta_tiempo = 1000.0 / JUEGO_FPS; // Espacio de tiempo entre frames
+
+    double timer_velocidad = 1000; // Lo uso para aumentar velocidad
+
+    double posi_real_pieza = 0;
+
     // END código del alumno
 
-    unsigned int ticks = SDL_GetTicks();
-
-    uint32_t tiempo_inicio = SDL_GetTicks(); // Para calcular el tiempo
-
-    uint32_t tiempo_anterior = SDL_GetTicks();
-
-    static double acumulado_caida_rapida = 0;
-
-    static int acumulador_izq = 0;
-    static int acumulador_der = 0;
+    unsigned int ticks = SDL_GetTicks(); // Medir tiempo de inicio
 
     while(1) {
 
-        uint32_t tiempo_actual = SDL_GetTicks();
-        uint32_t delta_ms = tiempo_actual - tiempo_anterior;
-        tiempo_anterior = tiempo_actual;
-        
-        pieza_t *p = juego_obtener_pieza_actual(juego);
         tablero_t *t = juego_obtener_tablero(juego);
+        pieza_t *p = juego_obtener_pieza_actual(juego);
 
         if(SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)
@@ -82,40 +83,23 @@ int main(int argc, char *argv[]) {
 
             // BEGIN código del alumno
 
-            uint32_t ahora = SDL_GetTicks(); // Para calcular el tiempo {}
-            uint32_t transcurrido = ahora - tiempo_inicio;
-
-            juego_setear_minutos(juego, transcurrido / 60000);
-            juego_setear_segundos(juego, (transcurrido % 60000) / 1000);
-            juego_setear_milisegundos(juego, transcurrido % 1000);
-
-            // Velocidad por tiempo
-
-            static uint32_t ultimo_segundo = 0;
-            uint32_t segundo_actual = transcurrido / 1000;
-
-            if (segundo_actual > ultimo_segundo) {
-                ultimo_segundo = segundo_actual;
-                juego_aumentar_velocidad_actual(juego);
-            }
-
-            // Tiempo ya seteado
-
             if (event.type == SDL_KEYDOWN) {
                 
                 switch(event.key.keysym.sym) {
                     case SDLK_LEFT:
-                        acumulador_izq = 4;  // 4 cuadros para mover 8 columnas
+                        // Ver que hacer con tecla izquierda (desplazar 8 pixeles en 4 cuadros)
+                        mover_izq = 4;
                         break;
 
                     case SDLK_RIGHT:
-                        acumulador_der = 4;
+                        // Ver que hacer con tecla derecha (desplazar 8 pixeles en 4 cuadros)
+                        mover_der = 4;
                         break;
 
                     case SDLK_UP:
-
+                        // Ver que hacer con tecla arriba (rotar pieza)
                         pieza_rotar(p);
-                        if (tablero_colision(t, p)) {
+                        if(tablero_colision(t, p)){
                             pieza_rotar(p);
                             pieza_rotar(p);
                             pieza_rotar(p);
@@ -123,10 +107,12 @@ int main(int argc, char *argv[]) {
                         break;
 
                     case SDLK_DOWN:
-                        acumulado_caida_rapida = 333;
+                        // Ver que hacer con tecla abajo (aumentar velocidad * 5)
+                        caer_rapido = 333;
                         break;
                 }
             }
+
             // END código del alumno
 
             continue;
@@ -134,64 +120,99 @@ int main(int argc, char *argv[]) {
 
         // BEGIN código del alumno
 
-        // Mover izquierda si queda acumulador
-        if(acumulador_izq > 0) {
-            pieza_mover_columna(p, -2);  // 2 columnas por cuadro -> 4 cuadros = 8 columnas
-            if(tablero_colision(t, p))
-                pieza_mover_columna(p, +2);
-            acumulador_izq--;
-        }
-
-        // Mover derecha si queda acumulador
-        if(acumulador_der > 0) {
-            pieza_mover_columna(p, +2);
-            if(tablero_colision(t, p))
-                pieza_mover_columna(p, -2);
-            acumulador_der--;
-        }
         
-        /* ---- CAÍDA AUTOMÁTICA DE LA PIEZA ---- */
-        static double acumulado = 0;
-        acumulado += delta_ms;
-
+        
+        
+        
         double velocidad = juego_obtener_velocidad_actual(juego);
 
+        juego_setear_minutos(juego, ticks / 60000); // Dato minutos
 
-        if(acumulado_caida_rapida > 0){
-            velocidad *= 5;
-            acumulado_caida_rapida -= delta_ms;
-            
-            if(acumulado_caida_rapida < 0){
-                acumulado_caida_rapida = 0;
+        juego_setear_segundos(juego, (ticks / 1000) % 60); // Dato segundos
+
+        juego_setear_milisegundos(juego, ticks % 1000); // Dato milisegundos
+
+        // Mover izquierda 
+        if(mover_izq > 0) {
+            pieza_mover_columna(p, -1);  // Muevo de a uno
+            if(tablero_colision(t, p))
+                pieza_mover_columna(p, +1);
+
+            pieza_mover_columna(p, -1);  // Muevo de a uno
+            if(tablero_colision(t, p))
+                pieza_mover_columna(p, +1);
+            mover_izq--;
+        }
+
+        // Mover derecha 
+        if(mover_der > 0) {
+            pieza_mover_columna(p, +1);
+            if(tablero_colision(t, p))
+                pieza_mover_columna(p, -1);
+
+            pieza_mover_columna(p, +1);
+            if(tablero_colision(t, p))
+                pieza_mover_columna(p, -1);
+            mover_der--;
+        }
+        
+        // Proceso de caida de la pieza
+
+        if(timer_velocidad > 0){
+            timer_velocidad -= delta_tiempo;
+            if(timer_velocidad <= 0){
+                juego_aumentar_velocidad_actual(juego);
+                timer_velocidad += 1000;
             }
         }
 
-        uint32_t delay = (uint32_t)(1000 / velocidad);
+        if(caer_rapido > 0){
+            velocidad *= 5;
+            caer_rapido -= delta_tiempo;
 
-        if (acumulado >= delay) {
-            acumulado -= delay;
+            if(caer_rapido < 0){
+                caer_rapido = 0;
+            }
+        }
 
-            pieza_mover_fila(p, 1);
+        double paso = velocidad * delta_tiempo / 1000; // El step de la pieza
 
-            if (tablero_colision(t, p)) {
+        posi_real_pieza += paso; // Posicion real de la pieza
 
-                /* ---- PEGAR PIEZA EN TABLERO ---- */
-                tablero_pegar_pieza(t, p);
+        while(posi_real_pieza - 1 > pieza_get_fila(p)){
 
-                /* ---- NUEVA PIEZA ---- */
-                juego_setear_pieza_actual(juego, juego_obtener_pieza_siguiente(juego));
-                pieza_t *p_siguiente = pieza_crear(figuras);
-                juego_setar_pieza_siguiente(juego, p_siguiente);
+                pieza_mover_fila(p, 1);
 
-                /* ---- GAME OVER ---- */
-                if (tablero_perdio(t, juego_obtener_pieza_actual(juego))) {
+                if (tablero_colision(t, p)) {
+                
+                    // Cerrar juego
+
+                    if (tablero_perdio(t, juego_obtener_pieza_actual(juego))) {
+                        break;
+                    }
+
+                    // Pegar pieza
+
+                    tablero_pegar_pieza(t, p);
+
+                    // Generar pieza nueva y pasar a actual
+
+                    juego_setear_pieza_actual(juego, juego_obtener_pieza_siguiente(juego));
+                    pieza_t *p_siguiente = pieza_crear(figuras);
+                    juego_setar_pieza_siguiente(juego, p_siguiente);
+
+                    posi_real_pieza = (double)pieza_get_fila(juego_obtener_pieza_actual(juego));
                     break;
                 }
-            }
+        }
+
+        if(tablero_perdio(t, juego_obtener_pieza_actual(juego))){
+            break;
         }
         
 
-        /* ---- SIMULAR ARENA (3 veces) ---- */
+        // Simulacion de arena + lineas
+
         for (int i = 0; i < 3; i++) {
             tablero_simular_arena(t);
 
@@ -202,21 +223,24 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        /* ---- GENERAR FRAME ---- */
+        // Genero frame
+
         imagen_t *frame = juego_generar_frame(juego, figuras);
 
-        /* ---- PASAR imagen_t (RGB565) A canvas (RGBA8888) ---- */
-        memset(canvas, 0, sizeof(canvas));
+        // Paso imagen a formato de SDL
 
         for (size_t f = 0; f < imagen_alto(frame); f++) {
             for (size_t c = 0; c < imagen_ancho(frame); c++) {
-                color_t cc = imagen_obtener_pixel(frame, f, c);
-                uint8_t r, g, b;
-                color_a_rgb(cc, &r, &g, &b);
 
-                canvas[f * VENTANA_ANCHO + c] =
-                    (r << 24) | (g << 16) | (b << 8) | 0xFF;
-            }
+                color_t cc = imagen_obtener_pixel(frame, f, c);
+
+                uint8_t r, g, b;
+                color_a_rgb(cc, &r, &g, &b); 
+
+                // Se ve que es asi el formato
+
+                canvas[f * VENTANA_ANCHO + c] = (r << 24) | (g << 16) | (b << 8) | 0xFF;
+                }
         }
         
         // END código del alumno

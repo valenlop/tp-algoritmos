@@ -13,7 +13,7 @@ typedef struct juego juego_t;
 
 //Constructor
 
-juego_t *juego_crear(imagen_t *fondo, sprites_t *figuras); // Lo primero que se hace (iniciar el juego)
+juego_t *juego_crear(imagen_t *fondo, sprites_t *figuras);
 
 // Destructor
 
@@ -28,8 +28,6 @@ tablero_t *juego_obtener_tablero(juego_t *j);
 pieza_t *juego_obtener_pieza_actual(juego_t *j);
 
 pieza_t *juego_obtener_pieza_siguiente(juego_t *j);
-
-// Podria agregar juego_obtener_tubo pero creo que no sirve para nada
 
 size_t juego_obtener_puntaje(juego_t *j);
 

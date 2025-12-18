@@ -1,4 +1,3 @@
-// Revisar ((Va a andar mal simular_arena y linea_formada))
 
 // Implementacion firmas de tablero.h
 
@@ -6,12 +5,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 struct tablero {
     // tablero es la imagen que representara al tablero del juego
     // Si tablero == NULL (no pasara nunca)
 
-    imagen_t *tablero; // Parece que solo agregamos un puntero mas
+    imagen_t *tablero;
 };
 
 // Esta es la que visita cada pixel
@@ -38,20 +38,22 @@ static bool visitar(tablero_t *t, imagen_t *visitados, size_t f, size_t c, color
         return false;
     }
 
+    // Chequeo de pixel negro (necesario porque la parte E del rojo y el negro es la misma)
+
+    if(imagen_obtener_pixel(t->tablero, f , c) == 0){
+        return false;
+    }
+
     // (4) Chequeo si llegue a la ultima columna (exploro hacia arriba y abajo)
 
     if(c == ancho - 1){
         imagen_setear_pixel(visitados, f, c, 1);
-
-        visitar(t, visitados, f + 1, c, color_buscado);
-        visitar(t, visitados, f - 1, c, color_buscado);
-
         return true;
     }
 
     // (5) Marcar el pixel como visitado en visitados (en este caso el pixel es del color pero no llegamos al final)
 
-    imagen_setear_pixel(visitados, f, c, 1);
+    imagen_setear_pixel(visitados, f, c, 0xff); // Pinto de blanco visitados
 
     // (6) Ir hacia derecha, arriba, abajo e izquiera (en ese orden)
 
@@ -61,6 +63,37 @@ static bool visitar(tablero_t *t, imagen_t *visitados, size_t f, size_t c, color
     visitar(t, visitados, f, c - 1, color_buscado); // Izquierda
 
 }
+
+static void completar_visita(tablero_t *t, imagen_t *visitados, size_t f, size_t c, color_t color_buscado){
+    size_t ancho = imagen_ancho(visitados);
+    size_t alto  = imagen_alto(visitados);
+
+    if(f >= alto || c >= ancho)
+        return;
+
+    if(imagen_obtener_pixel(visitados, f, c) != 0)
+        return;
+
+    color_t color_actual = imagen_obtener_pixel(t->tablero, f, c);
+    if(color_actual == 0)
+        return;
+
+    if(color_e(color_actual) != color_e(color_buscado))
+        return;
+
+    imagen_setear_pixel(visitados, f, c, 0xff);
+
+    if(f > 0)
+        completar_visita(t, visitados, f - 1, c, color_buscado);
+    if(f + 1 < alto)
+        completar_visita(t, visitados, f + 1, c, color_buscado);
+    if(c > 0)
+        completar_visita(t, visitados, f, c - 1, color_buscado);
+    if(c + 1 < ancho)
+        completar_visita(t, visitados, f, c + 1, color_buscado);
+}
+
+
 
 // Podria usar la matriz de visitados y eliminar esos pixeles
 
@@ -110,7 +143,7 @@ void tablero_destruir(tablero_t *t){
     free(t);
 }
 
-// (3) Deberia ser asi de basico, pero podria faltar algo (Ojo con donde es el cero de la pieza)
+// (3)
 
 bool tablero_perdio(tablero_t *t, pieza_t *p){
     if(tablero_colision(t, p) && pieza_get_fila(p) == 0){
@@ -122,7 +155,7 @@ bool tablero_perdio(tablero_t *t, pieza_t *p){
     }
 }
 
-// (4) imagen_obtener_pixel(t->tablero, f + 1, c) tiene cositas
+// (4)
 
 bool tablero_colision(tablero_t *t, pieza_t *p){
 
@@ -153,18 +186,14 @@ bool tablero_colision(tablero_t *t, pieza_t *p){
     return false;
 }
 
-// (5) No voy a chequear que este dentro del tablero (eso deberia suceder). Lo que pase con la pieza despues se ve afuera (hablando de liberar memoria)
-
-// Se debe asegurar que la pieza en su imagen los pixeles no participantes del tetramino son negros (0x00)
+// (5) 
 
 bool tablero_pegar_pieza(tablero_t *t, pieza_t *p){
     
-    return imagen_pegar_no_negros(t->tablero, pieza_get_imagen(p), pieza_get_fila(p), pieza_get_columna(p)); // Ojo aca con pegar los que no son
+    return imagen_pegar_no_negros(t->tablero, pieza_get_imagen(p), pieza_get_fila(p), pieza_get_columna(p));
 }
 
-// (6) Tiene algunas situaciones particulares donde se pisan los pixeles que se mueven (solucionar mas adelante). 
-
-// Tendria que fijarse en el tablero nuevo si realmente pueden ir a la ubicacion (los pixeles)
+// (6) 
 
 void tablero_simular_arena(tablero_t *t){
 
@@ -184,7 +213,7 @@ void tablero_simular_arena(tablero_t *t){
         }
     }
 
-    // Recorro todos los pixeles (aca hay un error)
+    // Recorro todos los pixeles, no piso pixeles de color con otros de color (lo doy por terminado)
 
     for(size_t f = alto - 2; f < alto - 1 ; f--){
         for(size_t c = 0; c < ancho; c++){
@@ -201,19 +230,19 @@ void tablero_simular_arena(tablero_t *t){
                 else{
 
                     color_t color_abajo = imagen_obtener_pixel(t->tablero, f + 1, c);
-                    // color_t color_abajo_t_nuevo = imagen_obtener_pixel(tablero_nuevo->tablero, f + 1, c); // Esto va a complicar la cosa pero simula bien
+                    color_t color_abajo_t_nuevo = imagen_obtener_pixel(tablero_nuevo->tablero, f + 1, c); // Esto va a complicar la cosa pero simula bien
 
-                    if(color_abajo == 0){ // Se puede bajar
+                    if(color_abajo == 0 && color_abajo_t_nuevo == 0){ // Se puede bajar y no pisa otro pixel de color (cualquier columna)
                         if(!imagen_setear_pixel(tablero_nuevo->tablero, f + 1, c, color)){
                             tablero_destruir(tablero_nuevo);
                             return;
                         }
                     }
-                    else if(c == 0 && color_abajo != 0){ // Primer columna y no se puede bajar
+                    else if(c == 0){ // Primer columna
                         color_t color_abajo_derecha = imagen_obtener_pixel(t->tablero, f + 1, c + 1);
-                        //color_t color_abajo_derecha_t_nuevo = imagen_obtener_pixel(tablero_nuevo->tablero, f + 1, c + 1);
+                        color_t color_abajo_derecha_t_nuevo = imagen_obtener_pixel(tablero_nuevo->tablero, f + 1, c + 1);
 
-                        if(color_abajo_derecha == 0){
+                        if(color_abajo_derecha == 0 && color_abajo_derecha_t_nuevo == 0){
                             if(!imagen_setear_pixel(tablero_nuevo->tablero, f + 1, c + 1, color)){
                                 tablero_destruir(tablero_nuevo);
                                 return;
@@ -226,11 +255,11 @@ void tablero_simular_arena(tablero_t *t){
                             }
                         }
                     }
-                    else if(c == ancho - 1 && color_abajo != 0){ // Ultima columna y no se puede bajar
+                    else if(c == ancho - 1){ // Ultima columna
                         color_t color_abajo_izquierda = imagen_obtener_pixel(t->tablero, f + 1, c - 1);
-                        //color_t color_abajo_izquierda_t_nuevo = imagen_obtener_pixel(tablero_nuevo->tablero, f + 1, c - 1);
+                        color_t color_abajo_izquierda_t_nuevo = imagen_obtener_pixel(tablero_nuevo->tablero, f + 1, c - 1);
 
-                        if(color_abajo_izquierda == 0){
+                        if(color_abajo_izquierda == 0 && color_abajo_izquierda_t_nuevo == 0){
                             if(!imagen_setear_pixel(tablero_nuevo->tablero, f + 1, c - 1, color)){
                                 tablero_destruir(tablero_nuevo);
                                 return;
@@ -244,34 +273,35 @@ void tablero_simular_arena(tablero_t *t){
                         }
                     }
                     else{ // Todas las columnas intermedias y no se puede bajar (solo en diagonal)
+                        assert(c < ancho - 1);
 
                         color_t color_abajo_izquierda = imagen_obtener_pixel(t->tablero, f + 1, c - 1);
                         color_t color_abajo_derecha = imagen_obtener_pixel(t->tablero, f + 1, c + 1);
 
-                        //color_t c_abajo_i_t_nuevo = imagen_obtener_pixel(tablero_nuevo->tablero, f + 1, c - 1);
-                        //color_t c_abajo_d_t_nuevo = imagen_obtener_pixel(tablero_nuevo->tablero, f + 1, c + 1);
+                        color_t c_abajo_i_t_nuevo = imagen_obtener_pixel(tablero_nuevo->tablero, f + 1, c - 1);
+                        color_t c_abajo_d_t_nuevo = imagen_obtener_pixel(tablero_nuevo->tablero, f + 1, c + 1);
 
-                        if(color_abajo_derecha == 0 && color_abajo_izquierda == 0){
+                        if(color_abajo_derecha == 0 && color_abajo_izquierda == 0 && c_abajo_i_t_nuevo == 0 && c_abajo_d_t_nuevo == 0){
                             if(rand() % 2 == 1){
-                                if(!imagen_setear_pixel(tablero_nuevo->tablero, f + 1, c - 1, color)){ // Pego a la izquierda
+                                if(!imagen_setear_pixel(tablero_nuevo->tablero, f + 1, c - 1, color)){ // Pego a la izquierda y no piso pixel de color
                                     tablero_destruir(tablero_nuevo);
                                     return;
                                 }
                             }
                             else{
-                                if(!imagen_setear_pixel(tablero_nuevo->tablero, f + 1, c + 1, color)){ // Pego a la derecha
+                                if(!imagen_setear_pixel(tablero_nuevo->tablero, f + 1, c + 1, color)){ // Pego a la derecha y no piso pixel de color
                                     tablero_destruir(tablero_nuevo);
                                     return;
                                 }
                             }
                         }
-                        else if(color_abajo_izquierda == 0 && color_abajo_derecha != 0){
+                        else if(color_abajo_izquierda == 0 && color_abajo_derecha != 0 && c_abajo_i_t_nuevo == 0){
                             if(!imagen_setear_pixel(tablero_nuevo->tablero, f + 1, c - 1, color)){ // Pego a la izquiera (unico caso)
                                 tablero_destruir(tablero_nuevo);
                                 return;
                             }
                         }
-                        else if(color_abajo_izquierda != 0 && color_abajo_derecha == 0){
+                        else if(color_abajo_izquierda != 0 && color_abajo_derecha == 0 && c_abajo_d_t_nuevo == 0){
                             if(!imagen_setear_pixel(tablero_nuevo->tablero, f + 1, c + 1, color)){ // Pego a la derecha (unico caso)
                                 tablero_destruir(tablero_nuevo);
                                 return;
@@ -299,26 +329,51 @@ void tablero_simular_arena(tablero_t *t){
 // (7) Puede faltar algo pero deberia andar
 
 bool tablero_linea_formada(tablero_t *t, size_t *puntaje){
-    imagen_t *visitados = imagen_crear(tablero_ancho(t), tablero_alto(t));
-    if(visitados == NULL){
-        printf("Fallo pedido de memoria");
-        return false;
-    }
 
-    imagen_iniciar_color(visitados, 0x00);
+    size_t alto = tablero_alto(t);
 
-    for(size_t f = 0; f < tablero_alto(t); f++){
+    // Creo superimagen de visitados
+
+    imagen_t **superimagen = calloc(alto, sizeof(imagen_t *));
+    if(superimagen == NULL) return false;
+
+    for(size_t f = 0; f < alto; f++){
         color_t color_buscado = imagen_obtener_pixel(t->tablero, f, 0);
 
         if(color_buscado){
-            if(visitar(t, visitados, f, 0, color_buscado)){
-                *puntaje = tablero_bloque_eliminar(t, visitados);
-                imagen_destruir(visitados);
+            superimagen[f] = imagen_crear(tablero_ancho(t), tablero_alto(t));
+            if(superimagen[f] == NULL){
+                for(size_t j = 0; j < f; j++){
+                    if(superimagen[j]){
+                        imagen_destruir(superimagen[j]);
+                    }
+                }
+                free(superimagen);
+                printf("Fallo pedido de memoria");
+                return false;
+            }
+
+            imagen_iniciar_color(superimagen[f], 0x00);
+
+            if(visitar(t, superimagen[f], f, 0, color_buscado)){
+                completar_visita(t, superimagen[f], f, 0, color_buscado); // Tengo la linea formada, me falta el bloque completo
+                *puntaje = tablero_bloque_eliminar(t, superimagen[f]);
+                for(size_t j = 0; j < f; j++){
+                    if(superimagen[j]){
+                        imagen_destruir(superimagen[j]);
+                    }
+                }
+                free(superimagen);
                 return true;
             }
         }
     }
-    imagen_destruir(visitados);
+    for(size_t j = 0; j < alto; j++){
+        if(superimagen[j]){
+            imagen_destruir(superimagen[j]);
+        }
+    }
+    free(superimagen);
     return false;
 
 
