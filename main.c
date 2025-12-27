@@ -246,9 +246,7 @@ int main(int argc, char *argv[]) {
         // END código del alumno
 
         SDL_UpdateTexture(texture, NULL, canvas, VENTANA_ANCHO * sizeof(uint32_t));
-        // SDL_RenderCopy(renderer, texture, NULL, NULL); // Toque aca para que se vea mas grande
-        SDL_Rect dest = {0, 0, VENTANA_ANCHO*4, VENTANA_ALTO*4}; // Despues borrar esto
-        SDL_RenderCopy(renderer, texture, NULL, &dest); // despues borrar esto
+        SDL_RenderCopy(renderer, texture, NULL, NULL);
 
         SDL_RenderPresent(renderer);
         ticks = SDL_GetTicks() - ticks;
